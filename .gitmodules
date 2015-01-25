@@ -1,6 +1,6 @@
-[submodule "cocos2d"]
-	path = cocos2d
-	url = git@github.com:cocos2d/cocos2d-swift.git
 [submodule "ads/fyber"]
 	path = ads/fyber
 	url = git@github.com:SponsorPay/mobile-sdk.git
+[submodule "cocos2d"]
+	path = cocos2d
+	url = git@github.com:cocos2d/cocos2d-iphone-classic.git
