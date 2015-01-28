@@ -7,6 +7,14 @@
 //
 
 #import "AppDelegate.h"
+#import "cocos2d.h"
+
+#import "AdButtonLayer.h"
+#import "RootViewController.h"
+#import "RootNavigationController.h"
+#import "GSGAdManager.h"
+
+#define kGSGEAGLViewTag 102039
 
 @interface AppDelegate ()
 
@@ -17,6 +25,121 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+//    sceneScale = 1;
+    //windowExternal = [[UIWindow alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    
+  //  originalBounds = [[UIScreen mainScreen] bounds];
+    
+    //window = [[UIWindow alloc] initWithFrame:originalBounds];
+    
+    if( ! [CCDirector setDirectorType:kCCDirectorTypeDisplayLink] )
+        [CCDirector setDirectorType:kCCDirectorTypeNSTimer];
+    
+    CCDirector *dir = [CCDirector sharedDirector];
+//    dir.projectionDelegate = self;
+  //  [dir setProjection:kCCDirectorProjectionCustom];
+    
+#if GAME_AUTOROTATION == kGameAutorotationUIViewController
+    [dir setDeviceOrientation:kCCDeviceOrientationPortrait];
+#else
+    [dir setDeviceOrientation:kCCDeviceOrientationLandscapeLeft];
+#endif
+    //	[dir setDisplayFPS:YES];
+    
+#if GSG_FPS_60
+    [dir setAnimationInterval:1.0/60];
+#elif GSG_FPS_30
+    [dir setAnimationInterval:1.0/30];
+#else
+    [dir setAnimationInterval:1.0/30];
+#endif
+    
+    EAGLView *glView = [EAGLView viewWithFrame:[_window bounds]
+                            pixelFormat:kEAGLColorFormatRGB565
+                            depthFormat:0
+              ];
+    
+    glView.tag = kGSGEAGLViewTag;
+    
+    [glView setMultipleTouchEnabled:NO];
+    
+    [dir setOpenGLView:glView];
+    
+//    if( ! [dir enableRetinaDisplay:![[GSGRuntimeTools instance] hasPlatformDescription:GSGPlatform_model_iTouch_4G]] )
+//        CCLOG(@"Retina Display Not supported");
+    
+    RootViewController *viewController = [[RootViewController alloc] initWithNibName:nil bundle:nil];
+    viewController.wantsFullScreenLayout = YES;
+    
+//#if INCLUDE_RUNTIME_TOOLS == 1
+//    statsWindow                = [[StatsWindow alloc] initWithNibName:@"StatsWindow" bundle:nil];
+//    statsWindow.view.hidden    = YES;
+//    statsWindow.view.center    = CGPointMake(statsWindow.view.frame.size.width / 2.0f, statsWindow.view.frame.size.height / 2.0f);
+//    glView.autoresizesSubviews = NO;
+//    
+//    [statsWindow showHideHUD];
+//    
+//    [glView addSubview:statsWindow.view];
+//#endif
+    
+    RootNavigationController *navigationController = [[RootNavigationController alloc] initWithRootViewController:viewController];
+    navigationController.navigationBar.hidden = YES;
+//    navigationController.delegate = self;
+    
+    [viewController setView:glView];
+    
+    if ([_window respondsToSelector:@selector(setRootViewController:)]) {
+        [_window setRootViewController:navigationController];
+    }
+    else {
+        [_window addSubview:navigationController.view];
+    }
+    
+    [_window makeKeyAndVisible];
+    
+//    initialized = YES;
+    
+    
+    [[GSGAdManager sharedInstance] initializeWithView:viewController andNewsDelegate:nil andIapProduct:nil];
+    
+    CCScene *sc = [CCScene node];
+    
+    [[CCDirector sharedDirector] pushScene:sc];
+
+    AdProductConfig *config = [[AdProductConfig alloc] init];
+    config.orderList = @[@"fyber"];
+    
+    AdButtonLayer *adLayer = [[AdButtonLayer alloc] initWithAdConfig:config
+                                                      viewController:[[[UIViewController alloc] init] autorelease]
+                                                navigationController:navigationController];
+    
+    
+    CCMenuItemSprite *btn = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile:@"button-store.png"]
+                                                    selectedSprite:[CCSprite spriteWithFile:@"button-store.png"]
+                                                             block:^(id sender)
+                                                             {
+                                                                 [adLayer buttonAction];
+                                                             }];
+    
+    adLayer.button = btn;
+    
+    CCMenu *m = [CCMenu menuWithItems:btn, nil];
+    
+    [sc addChild:m];
+    [sc addChild:adLayer];
+    
+    CCSprite *sprite = [CCSprite spriteWithFile:@"Redford-Promo.png"];
+    
+    [sc addChild:sprite];
+    
+    [sprite runAction:[CCRepeatForever actionWithAction:
+                   [CCSequence actions:
+                    [CCMoveTo actionWithDuration:3 position:ccp(0, 0)],
+                    [CCMoveTo actionWithDuration:3 position:ccp(200, 200)],
+                    [CCMoveTo actionWithDuration:3 position:ccp(100, 0)],
+                    nil]]];
+    
     return YES;
 }
 
