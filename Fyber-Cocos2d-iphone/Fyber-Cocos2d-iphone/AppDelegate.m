@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "cocos2d.h"
+#import "SponsorPaySDK.h"
 
 #import "AdButtonLayer.h"
 #import "RootViewController.h"
@@ -24,6 +25,8 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    [SponsorPaySDK setLoggingLevel:SPLogLevelVerbose];
     // Override point for customization after application launch.
     
 //    sceneScale = 1;
