@@ -60,7 +60,7 @@
 
         if (v)
         {
-            if (self.lastStatus == CLOSE_ABORTED || self.lastStatus == CLOSE_FINISHED)
+            if (self.lastStatus == CLOSE_ABORTED || self.lastStatus == CLOSE_FINISHED || self.lastStatus == ERROR)
             {
                 [self completeOffer];
             }
